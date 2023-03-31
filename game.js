@@ -7,7 +7,7 @@ const flappyImg = new Image();
 flappyImg.src = 'assets/flappy_dunk.png'
 
 //Game constants
-const FLAP_SPEED = -5;
+const FLAP_SPEED = -4;
 const BIRD_WIDTH = 40;
 const BIRD_HEIGHT = 30;
 const PIPE_WIDTH = 50;
@@ -28,6 +28,9 @@ let scoreDiv = document.getElementById('score-display');
 let score = 0;
 let highScore = 0;
 
+//we add a bool variable, so we can check when flappy passes we increase the value
+let scored = false;
+
 
  // lets us control the bird with the space key
 document.body.onkeyup = function(e) {
@@ -44,7 +47,18 @@ document.getElementById('restart-button').addEventListener('click', function() {
 })
 
 function increaseScore() {
-    // TODO
+    // increase now our counter when our flappy passes the pipes
+    if(birdX > pipeX + PIPE_WIDTH && 
+        (birdY < pipeY + PIPE_GAP ||
+        birdY + BIRD_HEIGHT > pipeY + PIPE_GAP) && !scored) {
+            score++;
+            scoreDiv.innerHTML = score;
+            scored = true;
+        }
+
+        if (birdX < pipeX + PIPE_WIDTH) {
+            scored = false;
+        }
 }
 
 function collisionCheck() {
@@ -80,7 +94,7 @@ function collisionCheck() {
 
     // Check for collision with lower pipe box
     if (birdBox.x + birdBox.width > bottomPipeBox.x &&
-        birdBox.x < width.x + bottomPipeBox.width &&
+        birdBox.x < bottomPipeBox.x + bottomPipeBox.width &&
         birdBox.y + birdBox.height > bottomPipeBox.y) {
             return true;
             }
@@ -123,6 +137,7 @@ function resetGame() {
     pipeY = canvas.height - 200;
 
     score = 0;
+
 }
 
 function endGame() {
@@ -162,6 +177,8 @@ if (collisionCheck()) {
     birdVelocity += birdAcceleration;
     birdY += birdVelocity;
 
+    // always check if you call the function
+    increaseScore();
     requestAnimationFrame(loop);
 }
 
